@@ -2,6 +2,7 @@ library(shiny)
 library(Benchmarking)
 library(DT)
 library(ggplot2)
+library(shinydashboard)
 
 
 function(input, output,session){
@@ -17,7 +18,7 @@ function(input, output,session){
     cl
   }
   
-  # è³‡æ–™è®€å–reactive----
+  # è³‡æ?™è?€??–reactive----
     deadata <- reactive({
       inputhisfile <- input$file1        
       if(is.null(inputhisfile)){
@@ -27,13 +28,13 @@ function(input, output,session){
       }
     })
     
-    # è³‡æ–™å‰è™•ç†
+    # è³‡æ?™å?è?•ç??
     XYpre <- reactive({
         if(is.null(deadata())){
             return(NULL)
         }else{
             ARData <- deadata()
-            ARDataColName <- colnames(ARData)[-1] # ç¬¬ä¸€è¡Œç‚ºprjcode 
+            ARDataColName <- colnames(ARData)[-1] # ç¬¬ä?€è¡Œç‚ºprjcode 
             Xcol <- na.omit(as.numeric(strsplit(paste(input$X)," ")[[1]]))
             Ycol <- na.omit(as.numeric(strsplit(paste(input$Y)," ")[[1]]))
             lenX <- length(Xcol)
@@ -46,24 +47,24 @@ function(input, output,session){
         }
     })
     
-    # è³‡æ–™è¼¸å…¥ã€ä¾ç…§è®Šæ•¸æ•¸é‡å±•é–‹UI
+    # è³‡æ?™è¼¸?…¥?€ä?ç…§è®Šæ•¸?•¸??å?•é?‹UI
     observeEvent(input$vGo,{
       inFile <- input$file1
       if (is.null(inFile)){
         showModal(modalDialog(
-          "è«‹å…ˆåŒ¯å…¥è³‡æ–™",
+          "è«‹å?ˆåŒ¯?…¥è³‡æ??",
           easyClose = T
           ,footer = modalButton("OK")
         ))
       }else if(any(duplicated(as.numeric(na.omit(as.numeric(strsplit(paste(input$X,input$Y)," ")[[1]])))))){
         showModal(modalDialog(
-          "æ¬„ä½é‡è¤‡",
+          "æ¬„ä?é?è??",
           easyClose = T
           ,footer = modalButton("OK")
         ))
       }else if(input$X==""|input$Y==""){
         showModal(modalDialog(
-          "è®Šæ•¸æ¬„ä½ä¸èƒ½ç©ºç™½",
+          "è®Šæ•¸æ¬„ä?ä?èƒ½ç©ºç™½",
           easyClose = T
           ,footer = modalButton("OK")
         ))
@@ -71,13 +72,13 @@ function(input, output,session){
         colchoosed<-setdiff(as.numeric(strsplit(paste(input$X,input$Y)," ")[[1]]),NA)
         if(any(colchoosed %in% which(checkclass(deadata())=="character"))){
           showModal(modalDialog(
-            "åªèƒ½é¸æ“‡æ•¸å­—å‹æ…‹æ¬„ä½",
+            "?ª?ƒ½?¸??‡æ•¸å­—å?‹æ?‹æ?„ä??",
             easyClose = T
             ,footer = modalButton("OK")
           ))
         }else if(any(!colchoosed %in% 1:ncol(deadata()))){
           showModal(modalDialog(
-            "è¼¸å…¥çš„æ¬„ä½è¶…å‡ºè³‡æ–™æ¬„ä½æ•¸",
+            "è¼¸å…¥??„æ?„ä?è?…å‡ºè³‡æ?™æ?„ä?æ•¸",
             easyClose = T
             ,footer = modalButton("OK")
           ))
@@ -153,7 +154,7 @@ function(input, output,session){
         }
       }
     })
-    # è³‡æ–™æª¢è¦–----
+    # è³‡æ?™æª¢è¦?----
     output$viewdata<-DT::renderDataTable({
       if (is.null(deadata())){
         return(NULL)
@@ -165,48 +166,48 @@ function(input, output,session){
       }
     })
     
-    # è¨ˆç®—å®Œç•¢è¦–çª—+è·³è½‰Panel
+    # è¨ˆç?—å?Œç•¢è¦–ç??+è·³è?‰Panel
     observeEvent(input$run,{
       if(!is.null(deadata()) & !is.null(XYpre)){
           showModal(modalDialog(
-            div("å°ˆæ¡ˆç›¸å°æ•ˆç‡è¨ˆç®—å®Œç•¢ï¼", style = "font-size:200%"),
+            div("å°ˆæ?ˆç›¸å°æ?ˆç?‡è?ˆç?—å?Œç•¢ï¼?", style = "font-size:200%"),
             easyClose = T, footer = modalButton("OK")))
-        #è·³è½‰panel ----
+        #è·³è?‰panel ----
           updateTabsetPanel(session, "tabset",selected = "result")
       }else{
         showModal(modalDialog(
-          div("è«‹æª¢æŸ¥è³‡æ–™è¼¸å…¥æ˜¯å¦æ­£ç¢ºå®Œæ•´ï¼", style = "font-size:200%"),
+          div("è«‹æª¢?Ÿ¥è³‡æ?™è¼¸?…¥?˜¯?¦æ­?ç¢ºå?Œæ•´ï¼?", style = "font-size:200%"),
           easyClose = T
           ,footer = modalButton("OK")
         ))
       }
     })
     
-    # DEAè¨ˆç®—æ¨¡çµ„----
+    # DEAè¨ˆç?—æ¨¡çµ?----
     calculation <- eventReactive(input$run,{
           # Reactive Data
           ARData <- deadata()
           
           # Data Preprocess
           XYpre <- XYpre()
-          ARDataColName <- XYpre[[4]] # ç¬¬ä¸€è¡Œç‚ºprjcode(å·²åœ¨XYpreå»é™¤)
+          ARDataColName <- XYpre[[4]] # ç¬¬ä?€è¡Œç‚ºprjcode(å·²åœ¨XYpre?»?™¤)
           LC <- XYpre[[3]]
           Xcol <- XYpre[[1]] 
           Ycol <- XYpre[[2]]
 
-          # å»ºç«‹DEA AR Model
+          # å»ºç?‹DEA AR Model
           if(input$mode == 1){
               CCR <- dea.dual(X=ARData[,Xcol],Y=ARData[,Ycol],RTS="crs")
-              CCR.Result <- cbind(ARData[,1],"ç›¸å°æ•ˆç‡" = round(CCR$eff,10), round(CCR$u,10), round(CCR$v,10))
-              colnames(CCR.Result) <- c("Project Code", "ç›¸å°æ•ˆç‡", ARDataColName[Xcol-1], ARDataColName[Ycol-1] )
+              CCR.Result <- cbind(ARData[,1],"?›¸å°æ?ˆç??" = round(CCR$eff,10), round(CCR$u,10), round(CCR$v,10))
+              colnames(CCR.Result) <- c("Project Code", "?›¸å°æ?ˆç??", ARDataColName[Xcol-1], ARDataColName[Ycol-1] )
               return(CCR.Result)
           }else{
-            # è·‘CCR-AR-Iï¼Œä¸”æ¯æ ¼éƒ½è¦å¡«
-            # å–å‡ºinputã€outputæ¬Šé‡
+            # è·‘CCR-AR-Iï¼Œä?”æ?æ ¼?ƒ½è¦å¡«
+            # ??–å‡ºinput?€outputæ¬Šé??
             Inum <- 1:(LC["lenX"]-1)
             Onum <- 1:(LC["lenY"]-1)
             
-            # å…ˆå°‡æ¬Šé‡æŠ“å‡ºè®Šæˆvector
+            # ??ˆå?‡æ?Šé?æ?“å‡ºè®Šæ?vector
             lowerI <- 0; upperI <- 0
             for(t in 1:Inum){
               lowerI <- c(lowerI,input[[paste0("ILower",t)]])
@@ -218,7 +219,7 @@ function(input, output,session){
               upperO <- c(upperO,input[[paste0("IUpper",tt)]])
             }
             
-            # è®ŠæˆçŸ©é™£;row1æ˜¯lower, row2æ˜¯upper
+            # è®Šæ?çŸ©?™£;row1?˜¯lower, row2?˜¯upper
             InputWeight <- rbind(lowerI[-1], upperI[-1])
             OutputWeight <- rbind(lowerO[-1], upperO[-1])
 
@@ -231,18 +232,18 @@ function(input, output,session){
               Ovector <- c(Ovector,OutputWeight[,k])
             }
 
-            # é€™ç†çš„æ¬Šé‡å¿…é ˆç”±RenderUIå–å¾—
+            # ?€™ç?†ç?„æ?Šé?å?…é?ˆç”±RenderUI??–å??
             dual.AR <- matrix(c(Ivector,Ovector), nrow=LC["lenX"]+LC["lenY"]-2, ncol=2, byrow=TRUE)
             E.AR <- dea.dual(X=ARData[,Xcol],Y=ARData[,Ycol],RTS="crs", DUAL=dual.AR)
             
-            AR.Result <- cbind(ARData[,1],"ç›¸å°æ•ˆç‡" = round(E.AR$eff,10), round(E.AR$u,10), round(E.AR$v,10))
-            colnames(AR.Result) <- c("Project Code", "ç›¸å°æ•ˆç‡", ARDataColName[Xcol-1], ARDataColName[Ycol-1] )
+            AR.Result <- cbind(ARData[,1],"?›¸å°æ?ˆç??" = round(E.AR$eff,10), round(E.AR$u,10), round(E.AR$v,10))
+            colnames(AR.Result) <- c("Project Code", "?›¸å°æ?ˆç??", ARDataColName[Xcol-1], ARDataColName[Ycol-1] )
             
             return(AR.Result)
           }
     })
     
-    # DEAçµæœoutput----
+    # DEAçµæ?œoutput----
     output$Efficiency <- DT::renderDataTable({
         if (is.null(calculation())){
           return(NULL)
@@ -254,7 +255,7 @@ function(input, output,session){
         }
     })
     
-    # å„²å­˜çµæœ----
+    # ?„²å­˜ç?æ??----
     output$SaveNum <- downloadHandler(
         filename = function() { paste0("DEA_Result - " ,Sys.Date(), ".csv") },
         content = function(file) {
@@ -267,7 +268,7 @@ function(input, output,session){
         }
     )
     
-    # åœ–è¡¨å‘ˆç¾----
+    # ??–è¡¨??ˆç¾----
     output$viewplot <- renderPlot({
       if(is.null(XYpre())){
         return(NULL)
@@ -277,14 +278,14 @@ function(input, output,session){
         
         # Data Preprocess
         XYpre <- XYpre()
-        ARDataColName <- XYpre[[4]] # ç¬¬ä¸€è¡Œç‚ºprjcode(å·²åœ¨XYpreå»é™¤)
+        ARDataColName <- XYpre[[4]] # ç¬¬ä?€è¡Œç‚ºprjcode(å·²åœ¨XYpre?»?™¤)
         LC <- XYpre[[3]]
         Xcol <- XYpre[[1]]
         Ycol <- XYpre[[2]]
         
         weight <- apply(as.matrix(calculation()),2,as.numeric)
         
-        # çŸ©é™£ç›¸ä¹˜ä¸¦æŠ“å°è§’ç·šç‚ºåˆ†æ•¸
+        # ?Ÿ©?™£?›¸ä¹˜ä¸¦??“å?è?’ç?šç‚º??†æ•¸
         Xm <- apply(as.matrix(ARData[,Xcol]),2,as.numeric)
         Ym <- apply(as.matrix(ARData[,Ycol]),2,as.numeric)
         
